@@ -30,3 +30,11 @@ Por exemplo:
   ```
 
 ![image](https://github.com/user-attachments/assets/fa522441-5b14-431d-a5c5-397dabb01e20)
+
+
+## Automatizando essa tarefa
+- Para automatizar essa tarefa de criação de registros, o provedor DNS deverá fornecer acesso a uma API.
+- Alguns exemplos de provedores que fornecem acesso:
+- [Cloudflare](https://developers.cloudflare.com/api/operations/dns-records-for-a-zone-create-dns-record)
+- [Gandi](https://api.gandi.net/docs/domains/)
+- [DNSSimple](https://dnsimple.com/api)
