@@ -22,4 +22,11 @@ Por exemplo:
   curl https://seudominio.com.br --resolve 'seudominio.com.br:443:IP-DO-SERVIDOR-3'
   ```
 
-  
+## Configurar registros para seus servidores
+- Adicione um subdomínio para facilitar o acesso ao seu servidor.
+- Dessa maneira, o acesso ssh poderia ser feito utilizando o nome do servidor:
+  ```bash
+  ssh usuario@servidor01.seudominio.com.br
+  ```
+
+![image](https://github.com/user-attachments/assets/fa522441-5b14-431d-a5c5-397dabb01e20)
