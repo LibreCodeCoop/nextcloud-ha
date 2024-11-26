@@ -1,11 +1,16 @@
 # Infraestrutura como código
 
 ## Instalação do ansible e módulos necessários
+- Consulte [aqui](https://docs.ansible.com/ansible/latest/installation_guide/installation_distros.html#installing-distros) como instalar o Ansible na sua distribuição.
+- Utilizararemos a colletion do docker community, que pode ser instalada com esse comando: `ansible-galaxy collection install community.docker`
+- Para verificar a versão do Ansible, no terminal, digite: `ansible --version`
 
 ## Dados sensíveis e de configuração não versionados
+[Issue#27](https://github.com/LibreCodeCoop/gestao-infraestrutura/issues/27)
 
 ## Estrutura de pastas
 ### Pasta principal
+
 ```bash
 ansible/
 ├── ansible.cfg
@@ -29,7 +34,7 @@ inventory        = inventory.ini
 #remote_user      = vagrant
 
 # Chave privada utilizada para se conectar
-#private_key_file = /home/user/.ssh/id_rsa
+private_key_file = /home/user/.ssh/id_rsa
 
 # Argumentos da conexão SSH
 #[ssh_connection]
@@ -141,7 +146,7 @@ ansible-playbook -i inventory.ini playbook.yml
 
 # FAQ
 1. Qual solução utilizar como Registry?
-- Docker Registry por hora.
+- Docker Registry.
 2. Utilizaremos imagens oficiais Docker?
 - Sim, e quando necessário, personalizar as mesmas.
 3. O que utilizaremos para versionar a criação das imagens?
@@ -150,3 +155,4 @@ ansible-playbook -i inventory.ini playbook.yml
 - https://github.com/getwud/wud (a ser testado)
 5. Qual ferramenta pode ser utilizada para melhorar a segurança das imagens?
 - [Docker Scout](https://docs.docker.com/scout/) (a ser testado)
+
