@@ -1,0 +1,14 @@
+---
+- hosts: banco
+  become: yes
+  tasks:
+    - name: Garante que o instalador esteja presente
+      ansible.builtin.copy:
+        src: assets/gm-installer
+        dest: /root/
+
+    - name: Torna o instalador execuvável
+      ansible.builtin.file:
+        path: /root/gm-installer
+        mode: a+x
+

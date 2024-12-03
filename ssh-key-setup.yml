@@ -1,0 +1,15 @@
+---
+- hosts: all, banco
+  tasks:
+    - name: Ensure .ssh directory exists
+      file:
+        path: /home/root/.ssh
+        state: directory
+        mode: '0700'
+    
+    - name: Add authorized key
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', '/home/mohr/git/nextcloud-ha/galera-key.pub') }}"
+
