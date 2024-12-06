@@ -1,0 +1,18 @@
+services:
+  nextcloud:
+    image: nextcloud:28
+    ports:
+      - 80:80
+    volumes:
+      - nextcloud_data:/var/www/html
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=BatatinhaQuandoNasceEspalhaARamaPeloChao
+      - MYSQL_HOST=localhost
+      - NEXTCLOUD_ADMIN_USER=admin
+      - NEXTCLOUD_ADMIN_PASSWORD=teste
+volumes:
+  nextcloud_data:
