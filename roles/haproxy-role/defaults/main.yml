@@ -1,0 +1,15 @@
+# defaults/main.yml
+application_dns: nuvem.librecode.coop
+contact_email: suporte@librecode.coop
+haproxy_docker_version: haproxy:2.6
+haproxy_service: haproxy
+haproxy_config: haproxy.cfg
+projects_dir: /root/projects/
+haproxy_dir: haproxy
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_pwd_stats: aTIEILOYRQjmy2pemNO2kGTpxwBwne
+haproxy_frontend_port: 80
+haproxy_backend_servers:
+  - { name: "server1", ip: "177.92.115.140", port: 80 }
+  - { name: "server2", ip: "136.248.118.176", port: 80 }

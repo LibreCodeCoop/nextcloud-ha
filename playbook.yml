@@ -1,0 +1,8 @@
+---
+- name: Configurar HAProxy em 3 servidores
+  hosts: haproxy_servers
+  become: yes
+  gather_facts: no
+
+  roles:
+    - haproxy-role
