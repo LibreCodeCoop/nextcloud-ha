@@ -93,3 +93,6 @@ graph TD
 ### Tailscale
 - Oferece uma solução Web mais amigável para gerência dispositivos. Executa o protocolo Wireguard.
 
+### Nebula
+
+- Segundo a documentação: "Nebula é uma rede definida por software peer-to-peer mutuamente autenticada com base no Noise Protocol Framework. Nebula usa certificados para afirmar o endereço IP, nome e associação de um nó dentro de grupos definidos pelo usuário. Os grupos definidos pelo usuário do Nebula permitem filtragem de tráfego independente do provedor entre nós."
