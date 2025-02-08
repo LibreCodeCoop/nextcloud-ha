@@ -1,0 +1,17 @@
+# defaults/main.yml
+traefik_version: "v3.3"
+traefik_domain: "example.com"
+traefik_wildcard_domain: "*.example.com"
+traefik_dashboard_user: "admin"
+traefik_dashboard_password: "supersecurepassword" 
+traefik_dashboard_domain: "traefik.example.com" 
+traefik_acme_email: "your-email@example.com"
+traefik_letsencrypt_storage: "/certs/acme.json"
+traefik_http_port: 80
+traefik_https_port: 443
+traefik_dashboard_port: 8080
+
+trafik_dir: /root/projects/traefik
+
+contact_email: suporte@librecode.coop
+certificate_resolver: cloudflare
