@@ -1,0 +1,55 @@
+---
+- name: Criar arquivo de teste no servidor 1
+  copy:
+    content: "Este é um arquivo de teste para verificar a replicação do GlusterFS."
+    dest: /mnt/glusterfs/testfile.txt
+  delegate_to: "{{ server1 }}"
+  register: file_creation
+
+- name: Registrar o tempo de criação do arquivo
+  set_fact:
+    start_time: "{{ ansible_date_time.iso8601 }}"
+
+- name: Aguardar até que o arquivo apareça no servidor 2
+  wait_for:
+    path: /mnt/glusterfs/testfile.txt
+    state: present
+  delegate_to: "{{ server2 }}"
+  register: file_wait
+
+- name: Registrar o tempo de aparecimento do arquivo no servidor 2
+  set_fact:
+    end_time: "{{ ansible_date_time.iso8601 }}"
+
+- name: Calcular o tempo de replicação
+  set_fact:
+    replication_time: "{{ (end_time | to_datetime) - (start_time | to_datetime) }}"
+
+- name: Verificar o checksum do arquivo no servidor 1
+  stat:
+    path: /mnt/glusterfs/testfile.txt
+  delegate_to: "{{ server1 }}"
+  register: file_stat_server1
+
+- name: Verificar o checksum do arquivo no servidor 2
+  stat:
+    path: /mnt/glusterfs/testfile.txt
+  delegate_to: "{{ server2 }}"
+  register: file_stat_server2
+
+- name: Validar checksum entre os servidores
+  assert:
+    that:
+      - file_stat_server1.stat.checksum == file_stat_server2.stat.checksum
+    fail_msg: "Checksum dos arquivos não correspondem!"
+    success_msg: "Checksum dos arquivos correspondem."
+
+- name: Exibir o tempo de replicação
+  debug:
+    msg: "Tempo de replicação: {{ replication_time }}"
+
+- name: Limpar arquivo de teste
+  file:
+    path: /mnt/glusterfs/testfile.txt
+    state: absent
+  delegate_to: "{{ server1 }}"

@@ -1,0 +1,6 @@
+---
+- name: Config
+  hosts: hapr
+  become: yes
+  roles:
+    - haproxy

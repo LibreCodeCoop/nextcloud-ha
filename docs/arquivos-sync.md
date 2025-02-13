@@ -75,7 +75,7 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 - O daemon glusterd deve estar em execução em todos os servidores de armazenamento que você deseja adicionar ao pool de armazenamento. V
 - O firewall nos servidores deve ser configurado para permitir acesso à porta 24007.
 
-- No seu serviço de DNS, adicione as entradas para os servidores.
+- No seu serviço de DNS, adicione as entradas do tipo A para os servidores.
 
 - No meu caso cenário:
 ```
@@ -120,7 +120,6 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 - Em todos servidores, crie um volume a ser compartilhado:
     `mkdir -p /data/brick1/gv0`
 
-
 - 
 ```
     gluster volume create gv0 replica 3 server1.librecode.coop:/data/brick1/gv0 server2.librecode.coop:/data/brick1/gv0 server3.librecode.coop:/data/brick1/gv0 force
@@ -136,7 +135,7 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 - No servidor1: 
 ```
     mkdir /mnt/gluster-test
-    mount.glusterfs server1.librecode.coop:/gv1 /mnt/gluster-test
+    mount.glusterfs server1.librecode.coop:/gv0 /mnt/gluster-test
 ```
 - Vamos testar, criando arquivos no volume:
 ```
@@ -157,13 +156,29 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     server3.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
 ```
 
+#### Ansible role
+- No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
+- 1) Inclua o `role` a sua playbook:
+```
+---
+- hosts: glusterfs_servers
+  become: yes
+  roles:
+    - glusterfs
+```
 
+- 2) Adicione ao seu `inventory.ini` o endereço dos servidores:
 ```
+[glusterfs_servers]
+server1.exemplo.coop
+server2.exemplo.coop
+server3.exemplo.coop
 ```
+3) Execute a playbook
 ```
+    ansible-playbook -i inventory playbook.yml
 ```
-```
-```
+
 ```
 ```
 ```
