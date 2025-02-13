@@ -1,9 +1,11 @@
 ---
-- name: Configurar HAProxy em 3 servidores
-  hosts: haproxy_servers
+# Dependências: python3-passlib
+
+- name: Configurar traefik
+  hosts: clusterservers
   become: yes
   gather_facts: no
   vars_files:
-    - secrets.yml
+    - vars/main.yml
   roles:
-    - haproxy-role
+    - traefik

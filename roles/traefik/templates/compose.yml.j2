@@ -28,4 +28,4 @@ services:
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls.certresolver=myresolver"
       - "traefik.http.routers.traefik.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users={{ traefik_dashboard_user }}:{{ traefik_dashboard_password | password_hash('sha1') }}"
+      - "traefik.http.middlewares.auth.basicauth.users={{ traefik_dashboard_user }}:{{ traefik_dashboard_password | password_hash('sha512') }}"

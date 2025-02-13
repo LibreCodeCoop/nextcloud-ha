@@ -9,23 +9,12 @@
 - name: Copia compose.yml do Traefik
   ansible.builtin.template:
     src: compose.yml.j2
-    dest: "{{ traefik_dir_dir }}/compose.yml"
+    dest: "{{ traefik_dir }}/compose.yml"
     mode: '0644'
 
-- name: Inicia haproxy com docker-compose
+- name: Inicia Traefik com docker-compose
   community.docker.docker_compose_v2:
-    project_src: "{{ traefik_dir_dir }}/"
+    project_src: "{{ traefik_dir }}/"
     state: present
     remove_orphans: true
-
-- name: Requisita certificados Let's Encrypt com certbot
-  command: >
-    docker exec haproxy-certbot certbot-certonly
-    --domain "{{ application_dns }}"
-    --email "{{ contact_email }}"
-    --dry-run
-
-- name: Exeutar haproxy-refresh
-  command: docker exec haproxy-certbot haproxy-refresh
-  when: certbot_result is changed
 
