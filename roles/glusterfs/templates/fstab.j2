@@ -1,0 +1,4 @@
+# Configuração automática do GlusterFS
+{% for server in glusterfs_servers %}
+{{ server }}:{{ glusterfs_volume_name }} {{ glusterfs_mount_point }} glusterfs defaults,_netdev 0 0
+{% endfor %}

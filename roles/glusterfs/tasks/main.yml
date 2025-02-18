@@ -1,0 +1,71 @@
+---
+- name: Atualizar cache de pacotes
+  apt:
+    update_cache: yes
+
+- name: Instalar o GlusterFS Server
+  apt:
+    name: glusterfs-server
+    state: present
+
+- name: Iniciar e habilitar o serviço glusterd
+  service:
+    name: glusterd
+    state: started
+    enabled: yes
+
+- name: Criar diretório para o brick
+  file:
+    path: "{{ glusterfs_brick_dir }}/{{ glusterfs_volume_name }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Adicionar servidores ao pool de armazenamento
+  command: "gluster peer probe {{ item }}"
+  with_items: "{{ glusterfs_servers }}"
+  when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
+  ignore_errors: yes  # Ignora erros se o servidor já estiver no pool
+
+- name: Verificar status dos peers
+  command: gluster peer status
+  register: peer_status
+  changed_when: false
+
+- name: Criar volume GlusterFS
+  command: >
+    gluster volume create {{ glusterfs_volume_name }} replica {{ glusterfs_replica_count }}
+    {% for server in glusterfs_servers %}
+    {{ server }}:{{ glusterfs_brick_dir }}/{{ glusterfs_volume_name }}
+    {% endfor %}
+    force
+  when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
+
+- name: Iniciar o volume GlusterFS
+  command: gluster volume start {{ glusterfs_volume_name }}
+  when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
+
+- name: Criar diretório de montagem
+  file:
+    path: "{{ glusterfs_mount_point }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Montar o volume GlusterFS
+  mount:
+    path: "{{ glusterfs_mount_point }}"
+    src: "{{ glusterfs_servers[0] }}:{{ glusterfs_volume_name }}"
+    fstype: glusterfs
+    opts: defaults,_netdev
+    state: mounted
+
+- name: Configurar montagem automática no /etc/fstab
+  template:
+    src: fstab.j2
+    dest: /etc/fstab
+    owner: root
+    group: root
+    mode: '0644'

@@ -1,4 +1,4 @@
----
+
 # Dependências: python3-passlib
 
 - name: Configurar traefik
@@ -9,3 +9,4 @@
     - vars/main.yml
   roles:
     - traefik
+
