@@ -1,0 +1,5 @@
+secrets.yml
+inventory.ini
+ansible.cfg
+.vagrant
+ansible.cfg

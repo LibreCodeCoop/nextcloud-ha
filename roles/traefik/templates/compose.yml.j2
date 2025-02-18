@@ -1,0 +1,31 @@
+
+services:
+  traefik:
+    image: traefik:{{ traefik_version }}
+    container_name: traefik
+    command:
+      - --api.dashboard=true
+      - --providers.docker
+      - --entrypoints.web.address=:{{ traefik_http_port }}
+      - --entrypoints.websecure.address=:{{ traefik_https_port }}
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.email={{ traefik_acme_email }}
+      - --certificatesresolvers.myresolver.acme.storage={{ traefik_letsencrypt_storage }}
+    ports:
+      - "{{ traefik_http_port }}:{{ traefik_http_port }}"
+      - "{{ traefik_https_port }}:{{ traefik_https_port }}"
+      - "{{ traefik_dashboard_port }}:{{ traefik_dashboard_port }}"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./config/static.yml:/etc/traefik/traefik.yml:ro"
+      - "./config/dynamic.yml:/etc/traefik/dynamic.yml:ro"
+      - "./certs/acme.json:/acme.json"
+
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`{{ traefik_domain }}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users={{ traefik_dashboard_user }}:{{ traefik_dashboard_password | password_hash('sha512') }}"

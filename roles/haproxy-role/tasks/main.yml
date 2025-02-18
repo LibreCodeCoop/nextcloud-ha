@@ -1,0 +1,59 @@
+# tasks/main.yml
+---
+- name: Cria diretório de projetos
+  ansible.builtin.file:
+    path: "{{ projects_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Cria diretório do HAProxy dentro do diretório de projetos
+  ansible.builtin.file:
+    path: "{{ projects_dir }}/{{ haproxy_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Cria diretório do HAProxy dentro do diretório de projetos
+  ansible.builtin.file:
+    path: "{{ projects_dir }}/{{ haproxy_dir }}/config"
+    state: directory
+    mode: '0755'
+
+- name: Copia haproxy.cfg o HAProxy
+  template:
+    src: haproxy.cfg.j2
+    dest: "{{ projects_dir }}/{{ haproxy_dir }}/config/{{ haproxy_config }}"
+
+- name: Copia compose.yml do haproxy
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ projects_dir }}/{{ haproxy_dir }}/compose.yml"
+    mode: '0644'
+
+- name: Copia index.html para testes
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ projects_dir }}/{{ haproxy_dir }}/index.html"
+    mode: '0644'
+
+- name: Adiciona hostname ao index.html
+  ansible.builtin.shell: hostname >> index.html
+  args:
+    chdir: "{{ projects_dir }}/{{ haproxy_dir }}"
+
+- name: Inicia haproxy com docker-compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ projects_dir }}/{{ haproxy_dir }}/"
+    state: present
+    remove_orphans: true
+
+- name: Requisita certificados Let's Encrypt com certbot
+  command: >
+    docker exec haproxy-certbot certbot-certonly
+    --domain "{{ application_dns }}"
+    --email "{{ contact_email }}"
+    --dry-run
+
+- name: Exeutar haproxy-refresh
+  command: docker exec haproxy-certbot haproxy-refresh
+  when: certbot_result is changed
+

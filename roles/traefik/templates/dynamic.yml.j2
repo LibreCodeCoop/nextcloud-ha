@@ -1,0 +1,15 @@
+http:
+  routers:
+    dashboard:
+      rule: "Host(`"{{ traefik_dashboard_domain }}"`)"
+      entryPoints:
+        - http
+      service: api@internal
+      middlewares:
+        - auth
+
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "user:"{{ traefik_dashboard_password }}""

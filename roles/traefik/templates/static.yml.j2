@@ -1,0 +1,36 @@
+global:
+  sendAnonymousUsage: true
+
+api:
+  dashboard: true
+  insecure: false
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    watch: true
+    exposedByDefault: false
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+log:
+  level: DEBUG
+  format: common
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "{{ contact_email }}"
+      storage: acme.json
+      #httpChallenge:
+        # used during the challenge
+      #  entryPoint: web
+      dnsChallenge:
+        provider: "{{ certificate_resolver }}"
+        delayBeforeCheck: 0
