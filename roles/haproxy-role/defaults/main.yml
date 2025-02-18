@@ -1,0 +1,21 @@
+# defaults/main.yml
+application_dns: nuvem.librecode.coop
+contact_email: suporte@librecode.coop
+haproxy_docker_version: haproxy:2.6
+haproxy_service: haproxy
+haproxy_config: haproxy.cfg
+projects_dir: /root/projects/
+haproxy_dir: haproxy
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_pwd_stats: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66376536613839306334643734656635363963613231643762643031353765336162376161353830
+          3736306130653630646639396633643030653837653732630a663961323939363364313364616632
+          32383861633432373163613864353737663236646635346465353736333662663731306531623036
+          6638663535363266630a653338636632353362646539336438336534613462646435303164643338
+          61386663316134653635623866383939363363316239316334343066626235376364
+haproxy_frontend_port: 80
+haproxy_backend_servers:
+  - { name: "server1", ip: "177.92.115.140", port: 80 }
+  - { name: "server2", ip: "136.248.118.176", port: 80 }
