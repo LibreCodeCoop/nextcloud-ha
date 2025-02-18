@@ -1,0 +1,11 @@
+
+# Usuário admin
+gmd_admin_user:
+# Senha do usuário admin
+gmd_admin_passwd:
+
+
+#influxdb:
+#influxdb_http_auth_enabled: true
+#influxdb_admin_user: 
+#influx_admin_passwd:
