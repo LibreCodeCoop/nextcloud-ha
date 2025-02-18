@@ -1,0 +1,4 @@
+.vagrant
+ansible.cfg
+inventory.ini
+ssh-key-setup.yml
