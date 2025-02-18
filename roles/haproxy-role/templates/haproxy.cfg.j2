@@ -1,0 +1,75 @@
+# templates/haproxy.cfg.j2
+global
+     log stdout format raw local0
+#    log /dev/log local0
+#    log /dev/log local1 notice
+#    chroot /var/lib/haproxy
+#    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+#    stats timeout 30s
+#    user {{ haproxy_user }}
+#    group {{ haproxy_group }}
+    daemon
+
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+
+    ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+    ssl-default-bind-options no-sslv3
+
+defaults
+    log global
+    mode http
+    option httplog
+    option dontlognull
+    timeout connect 5000ms
+    timeout client 50000ms
+    timeout server 50000ms
+
+resolvers docker_resolver
+    nameserver dns 127.0.0.11:53
+
+frontend http-in
+    bind *:${HTTP_PORT}
+
+    option forwardfor
+
+    http-request add-header "X-Forwarded-Proto" "http"
+
+    acl letsencrypt_http_acl path_beg /.well-known/acme-challenge/
+
+    redirect scheme https if !letsencrypt_http_acl { env(FORCE_HTTPS_REDIRECT) -m str true }
+
+    use_backend letsencrypt_http if letsencrypt_http_acl
+
+    default_backend http_back
+
+frontend https_in
+  bind *:${HTTPS_PORT} ssl crt /usr/local/etc/haproxy/default.pem crt /usr/local/etc/haproxy/certs.d ciphers ECDHE-RSA-AES256-SHA:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM
+
+  option forwardfor
+
+  http-request add-header "X-Forwarded-Proto" "https"
+
+  default_backend http_back
+
+backend b_letsencrypt
+    # se esse serviço não responder rápido é porque não está executando,
+    # então retorne rápido
+    timeout 10ms
+
+    server letsencrypt_http_srv 127.0.0.1:80
+
+backend http_back
+    default-server maxconn 500  check  observe layer7  error-limit 50  on-error mark-down  inter 1s  rise 30  slowstart 20s
+    balance roundrobin
+    server backend-app backend-app:80 check
+        {% for server in haproxy_backend_servers %}
+    server {{ server.name }} {{ server.ip }}:{{ server.port }} check backup
+    {% endfor %}
+
+listen stats
+    bind *:8080
+    stats enable
+    stats uri /stats
+    stats auth admin:"{{ haproxy_pwd_stats }}"
+
