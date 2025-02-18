@@ -79,9 +79,9 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 
 - No meu caso cenário:
 ```
-    server1.librecode.coop - 189.39.218.225
-    server2.librecode.coop - 177.92.115.140
-    server3.librecode.coop - 38.242.194.240
+    server1.librecode.coop - 189.x.x.x
+    server2.librecode.coop - 177.x.x.x
+    server3.librecode.coop - 38.x.x.x
 ```
 
 - Idealmente o diretório contendo os arquivos que serão sincronizados devem ficar em outro disco, separado do sistema operacional.
