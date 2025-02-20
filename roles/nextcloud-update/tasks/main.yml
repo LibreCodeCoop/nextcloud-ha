@@ -1,0 +1,66 @@
+# Rotina para atualizar a versão do Nextcloud
+
+
+- name: get nextcloud version
+  community.docker.docker_container_exec:
+    container: "{{ nextcloud_ct_name }}"
+    user: www-data
+    command: "php occ --version"
+  register: result
+- name: Print stdout
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Pull images
+  community.docker.docker_compose_v2:
+    project_src: "{{ nextcloud_dir }}"
+    pull: always
+  register: output
+- name: Show results
+  ansible.builtin.debug:
+    var: output
+
+- name: Enable maintenance mode
+  community.docker.docker_container_exec:
+    container: "{{ nextcloud_ct_name }}"
+    user: "{{ nextcloud_user_occ }}"
+    command: "php occ maintenance:mode --on"
+  register: result
+
+- name: Restart containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ nextcloud_dir }}"
+    state: restarted
+    recreate: always
+  register: output
+
+- name: Show results
+  ansible.builtin.debug:
+    var: output
+- name: Run aditional occ commands
+  community.docker.docker_container_exec:
+    container: "{{ nextcloud_ct_name }}"
+    user: "{{ nextcloud_user_occ }}"
+    command: "php occ {{ item }}"
+  loop:
+    - db:add-missing-columns
+    - db:add-missing-indices
+    - db:add-missing-primary-keys
+    - maintenance:repair --include-expensive
+    - config:system:set maintenance_window_start --type=integer --value=1
+    - app:update --all
+- name: Disable nextcloud maintenance mode
+  community.docker.docker_container_exec:
+    container: "{{ nextcloud_ct_name }}"
+    user: "{{ nextcloud_user_occ }}"
+    command: "php occ maintenance:mode --off"
+  register: result
+- name: Get nextcloud version
+  community.docker.docker_container_exec:
+    container: "{{ nextcloud_ct_name }}"
+    user: "{{ nextcloud_user_occ }}"
+    command: "php occ --version"
+  register: result
+- name: Print stdout
+  ansible.builtin.debug:
+    var: result.stdout

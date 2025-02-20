@@ -1,0 +1,5 @@
+
+nextcloud_service_name: nextcloud
+nextcloud_ct_name: nextcloud-nextcloud-1
+nextcloud_dir: /root/nextcloud/
+nextcloud_user_occ: www-data

@@ -10,3 +10,10 @@ Este de projeto se propõe a definir as melhores práticas para a configuração
 - Redis
 - Onlyoffice
   
+
+## Senhas necessárias a serem geradas
+- A senha do painel admin do Traefik precisa ser codificada usando MD5, SHA1, or BCrypt.
+- O comando abaixo irá encryptar uma senha com BCrypt e sanitizar os caracteres especiais para uso.
+```
+echo $(htpasswd -nB nome-do-usuário) | sed -e s/\\$/\\$\\$/g
+```
