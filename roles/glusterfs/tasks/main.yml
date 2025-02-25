@@ -1,21 +1,21 @@
 ---
 - name: Atualizar cache de pacotes
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
 
 - name: Instalar o GlusterFS Server
-  apt:
+  ansible.builtin.apt:
     name: glusterfs-server
     state: present
 
 - name: Iniciar e habilitar o serviço glusterd
-  service:
+  ansible.builtin.service:
     name: glusterd
     state: started
     enabled: yes
 
 - name: Criar diretório para o brick
-  file:
+  ansible.builtin.file:
     path: "{{ glusterfs_brick_dir }}/{{ glusterfs_volume_name }}"
     state: directory
     owner: root
@@ -23,7 +23,7 @@
     mode: '0755'
 
 - name: Criar diretório de montagem
-  file:
+  ansible.builtin.file:
     path: "{{ glusterfs_mount_point }}"
     state: directory
     owner: root
@@ -38,19 +38,19 @@
 #  ignore_errors: yes  # Ignora erros se o servidor já estiver no pool
 #
 - name: Adicionar servidores ao pool de armazenamento
-  command: "gluster peer probe {{ item }}"
+  ansible.builtin.command: "gluster peer probe {{ item }}"
   with_items: "{{ glusterfs_servers }}"
   when: >
     inventory_hostname != item  # Executa probe apenas para servidores diferentes do atual
   ignore_errors: yes  # Ignora erros se o servidor já estiver no pool
 
 - name: Verificar status dos peers
-  command: gluster peer status
+  ansible.builtin.command: gluster peer status
   register: peer_status
   changed_when: false
 
 - name: Criar volume GlusterFS
-  command: >
+  ansible.builtin.command: >
     gluster volume create {{ glusterfs_volume_name }} replica {{ glusterfs_replica_count }}
     {% for server in glusterfs_servers %}
     {{ server }}:{{ glusterfs_brick_dir }}/{{ glusterfs_volume_name }}
@@ -59,11 +59,11 @@
   when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
 
 - name: Iniciar o volume GlusterFS
-  command: gluster volume start {{ glusterfs_volume_name }}
+  ansible.builtin.command: gluster volume start {{ glusterfs_volume_name }}
   when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
-  
+
 - name: Montar o volume GlusterFS
-  mount:
+  ansible.builtin.mount:
     path: "{{ glusterfs_mount_point }}"
     src: "{{ glusterfs_servers[0] }}:{{ glusterfs_volume_name }}"
     fstype: glusterfs
@@ -71,15 +71,27 @@
     state: mounted
 
 - name: Configurar montagem automática no /etc/fstab
-  template:
-    src: fstab.j2
-    dest: /etc/fstab
-    owner: root
-    group: root
-    mode: '0644'
+  ansible.posix.mount:
+    backup: true
+    fstype: glusterfs
+    opts: "defaults,_netdev 0 0"
+    path: "{{ glusterfs_mount_point }}"
+    src: "{{ ansible_hostname }}:{{ glusterfs_brick_dir }}"
+    state: mounted
+
+#- name: Configurar montagem automática no /etc/fstab
+#  ansible.builtin.template:
+#    src: fstab.j2
+#    dest: /etc/fstab
+#    owner: root
+#    group: root
+#    mode: '0644'
 
 - name: Executar systemctl daemon-reload
   ansible.builtin.systemd_service:
     state: restarted
     daemon_reload: true
 
+- name: Definir IPs permitidos de clientes que podem montar volume GlusterFS
+  ansible.builtin.shell: >
+    gluster volume set {{ glusterfs_volume_name }} auth.allow {{ allowed_ips }}

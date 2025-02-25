@@ -12,6 +12,9 @@ glusterfs_replica_count: 2
 # Diretório de montagem local
 glusterfs_mount_point: /mnt/gluster-data5
 
+# IPs de clientes permitidos que podem montar o volume
+allowed_ips: "189.39.218.225,187.57.255.128,192.168.56.246"
+
 # Lista de servidores GlusterFS (nomes ou IPs)
 glusterfs_servers:
   - server2.librecode.coop
