@@ -1,19 +1,21 @@
 # Diretório onde os bricks serão criados
-glusterfs_brick_dir: /data/brick1
+glusterfs_brick_dir: /data/brick5
 
 # Nome dos volume GlusterFS
-glusterfs_volume_name: gv0
+glusterfs_volume_name: gv5
 
 # Número de réplicas = número de servidores (o melhor é ter 3)
 # Levar em consideração problemas de split-brain
 # https://docs.gluster.org/en/main/Administrator-Guide/Split-brain-and-ways-to-deal-with-it/
-glusterfs_replica_count: 3
+glusterfs_replica_count: 2
 
 # Diretório de montagem local
-glusterfs_mount_point: /mnt/gluster-data
+glusterfs_mount_point: /mnt/gluster-data5
 
 # Lista de servidores GlusterFS (nomes ou IPs)
 glusterfs_servers:
-  - server1.exemplo.coop
-  - server2.exemplo.coop
-  - server3.exemplo.coop
+  - server2.librecode.coop
+  - server1.librecode.coop
+
+
+

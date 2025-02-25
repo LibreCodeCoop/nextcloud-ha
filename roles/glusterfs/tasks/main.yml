@@ -22,10 +22,26 @@
     group: root
     mode: '0755'
 
+- name: Criar diretório de montagem
+  file:
+    path: "{{ glusterfs_mount_point }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+#
+#- name: Adicionar servidores ao pool de armazenamento
+#  command: "gluster peer probe {{ item }}"
+#  with_items: "{{ glusterfs_servers }}"
+#  when: inventory_hostname == glusterfs_servers[1]  # Executa probe do primeiro para o segundo servidor
+#  ignore_errors: yes  # Ignora erros se o servidor já estiver no pool
+#
 - name: Adicionar servidores ao pool de armazenamento
   command: "gluster peer probe {{ item }}"
   with_items: "{{ glusterfs_servers }}"
-  when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
+  when: >
+    inventory_hostname != item  # Executa probe apenas para servidores diferentes do atual
   ignore_errors: yes  # Ignora erros se o servidor já estiver no pool
 
 - name: Verificar status dos peers
@@ -45,15 +61,7 @@
 - name: Iniciar o volume GlusterFS
   command: gluster volume start {{ glusterfs_volume_name }}
   when: inventory_hostname == glusterfs_servers[0]  # Executa apenas no primeiro servidor
-
-- name: Criar diretório de montagem
-  file:
-    path: "{{ glusterfs_mount_point }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
+  
 - name: Montar o volume GlusterFS
   mount:
     path: "{{ glusterfs_mount_point }}"
@@ -69,3 +77,9 @@
     owner: root
     group: root
     mode: '0644'
+
+- name: Executar systemctl daemon-reload
+  ansible.builtin.systemd_service:
+    state: restarted
+    daemon_reload: true
+

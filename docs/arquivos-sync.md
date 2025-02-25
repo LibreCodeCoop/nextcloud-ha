@@ -84,6 +84,23 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     server3.librecode.coop - 38.x.x.x
 ```
 
+#### Terminologia:
+- Terminologia utilizada:
+```
+nó de sondagem - nó que inicia a operação de sondagem
+nó sondado - nó que está sendo adicionado ao cluster
+
+A sondagem de peer gluster é uma operação unidirecional. Quando um novo nó é
+sondado com seu nome de host, o nó de sondagem sabe sobre o nome de host do
+nó sondado e o adiciona ao seu banco de dados. No entanto, o nó sondado
+consegue ver apenas o endereço IP do nó de sondagem da conexão de rede.
+Portanto, ele registra apenas o endereço IP em seu banco de dados. Para
+substituir o endereço IP pelo nome do host, outra operação de sondagem de peer com
+nome de host do nó de sondagem pode ser feita a partir do nó sondado.
+
+-Vijay
+```
+
 - Idealmente o diretório contendo os arquivos que serão sincronizados devem ficar em outro disco, separado do sistema operacional.
 
     apt update
@@ -92,10 +109,11 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     systemctl enable glusterd
 
 - No servidor 1:
+```
     gluster peer probe servidor2
     gluster peer probe servidor3
 
-
+```
 - No servidor 2, com o comando `gluster peer status`:
 
 ```
@@ -113,42 +131,75 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     State: Peer in Cluster (Connected)
 
 ```
-- No servidor 2:
-    gluster peer probe servidor1
-    gluster peer probe servidor3
+
+
 
 - Em todos servidores, crie um volume a ser compartilhado:
     `mkdir -p /data/brick1/gv0`
 
-- 
+- O próximo passo é criar o volume no gluster, escolhendo o tipo (distribuído, replicado, distribuído replicado, disperso e distribuído dispersado). Neste exemplo vamos escolher o tipo *replicado*, o qual replicará o conteúdo dos volumes.
+- Crie o volume no glusterfs (atente-se a opção ``replica 3`` pois deve corresponder ao número de réplicas):
+> Nota: Usar apenas 2 volumes não é recomendado pois pode haver o problem de [split-brain](https://docs.gluster.org/en/main/Administrator-Guide/Split-brain-and-ways-to-deal-with-it/). Se decidir usar mesmo assim, use a opção ``force`` ao final do comando.
 ```
-    gluster volume create gv0 replica 3 server1.librecode.coop:/data/brick1/gv0 server2.librecode.coop:/data/brick1/gv0 server3.librecode.coop:/data/brick1/gv0 force
+    gluster volume create gv0 replica 3 server1.librecode.coop:/data/brick1/gv0 server2.librecode.coop:/data/brick1/gv0 server3.librecode.coop:/data/brick1/gv0
 ```
 - Inicialize o volume
 ```
     gluster volume start gv0
 ```
 
-- Agora vamos precisar montar esse volume no servidor, seguindo essa sintaxe `mount.glusterfs <IP ou hostname>:<nome_do_volume> <ponto_de_montagem>`
+- Agora vamos precisar montar esse volume no servidor, seguindo essa sintaxe 
+```
+    mount.glusterfs <IP ou hostname>:<nome_do_volume> <ponto_de_montagem>
+```
 - O IP ou hostname pode ser de qualquer servidor que esteja presente no cluster.
 
 - No servidor1: 
 ```
-    mkdir /mnt/gluster-test
-    mount.glusterfs server1.librecode.coop:/gv0 /mnt/gluster-test
+    mkdir /mnt/gluster-gv0
+    mount.glusterfs server1.librecode.coop:/gv0 /mnt/gluster-gv0
 ```
+- Se desejar acessar os dados no servidor 2 ou 3, repita o processo acima.
+
+- Verifique que foi montado com sucesso:
+- A saída do comando `mount` deve aparecer a seguinte linha:
+```
+    server1.librecode.coop:/gv5 on /mnt/gluster-gv5 type fuse.glusterfs (rw,relatime,user_id=0,group_id=0,default_permissions,allow_other,max_read=131072)
+```
+
+- A saída do comando `gluster volume info`:
+```
+    Volume Name: gv0
+    Type: Replicate
+    Volume ID: 93b0fce3-d5a7-4fc2-a6be-798b0f680ce0
+    Status: Started
+    Snapshot Count: 0
+    Number of Bricks: 1 x 2 = 2
+    Transport-type: tcp
+    Bricks:
+    Brick1: server1.librecode.coop:/data/brick1/gv0
+    Brick2: server2.librecode.coop:/data/brick1/gv0
+    Options Reconfigured:
+    cluster.granular-entry-heal: on
+    storage.fips-mode-rchecksum: on
+    transport.address-family: inet
+    nfs.disable: on
+    performance.client-io-threads: off
+```
+
 - Vamos testar, criando arquivos no volume:
 ```
-    for i in `seq -w 1 100`; do cp -rp /var/log/dpkg.log /mnt/gluster-test/copy-test-$i; done
+    for i in `seq -w 1 100`; do cp -rp /var/log/dpkg.log /mnt/gluster-gv0/copy-test-$i; done
 ```
 
 - Verificando se foram criados (essa pasta deve ser igual em todos servidores a partir de agora):
 ```
-    ls -lha /mnt/gluster-teste
+    ls -lha /mnt/gluster-gv0
 ```
 
 #### Montando volumes automacamente
-- Adicione ao /etc/fstab `HOSTNAME-OU-ENDEREÇOIP:/NOME-DO-VOLUME PONTO-DE-MONTAGEM glusterfs defaults,_netdev 0 0`:
+- Adicione ao /etc/fstab seguindo o padrão:
+> `HOSTNAME-OU-ENDEREÇOIP:/NOME-DO-VOLUME PONTO-DE-MONTAGEM glusterfs defaults,_netdev 0 0`
 
 ```
     server1.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
@@ -156,7 +207,7 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     server3.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
 ```
 
-#### Ansible role
+### Ansible role
 - No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
 - 1) Inclua o `role` a sua playbook:
 ```
