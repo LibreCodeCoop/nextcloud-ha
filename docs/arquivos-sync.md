@@ -78,16 +78,16 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 - No seu serviço de DNS, adicione as entradas do tipo A para os servidores.
 
 - No meu caso cenário:
-```
+    ```
     server1.librecode.coop - 189.x.x.x
     server2.librecode.coop - 177.x.x.x
     server3.librecode.coop - 38.x.x.x
-```
+    ```
 
 - Idealmente o diretório contendo os arquivos que serão sincronizados devem ficar em outro disco, separado do sistema operacional.
 
     apt update
-    apt install glusterfs-server
+    apt install glusterfs-server -y
     systemctl start glusterd
     systemctl enable glusterd
 
@@ -98,7 +98,7 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 
 - No servidor 2, com o comando `gluster peer status`:
 
-```
+    ```
     # gluster peer status
     Number of Peers: 2
 
@@ -112,72 +112,84 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     Uuid: 3418bdcc-8f9d-4082-993b-121656fcea14
     State: Peer in Cluster (Connected)
 
-```
+    ```
 - No servidor 2:
+    ```
     gluster peer probe servidor1
     gluster peer probe servidor3
+    ```
 
 - Em todos servidores, crie um volume a ser compartilhado:
     `mkdir -p /data/brick1/gv0`
 
-- 
-```
+ 
+    ```
     gluster volume create gv0 replica 3 server1.librecode.coop:/data/brick1/gv0 server2.librecode.coop:/data/brick1/gv0 server3.librecode.coop:/data/brick1/gv0 force
-```
+    ```
 - Inicialize o volume
-```
+    ```
     gluster volume start gv0
-```
+    ```
+
+- **Melhorando a segurança**
+    ```
+    Para restringir acesso aos diretório, podemos utilizar a diretiva `auth.allow`. Veja o seguinte exemplo abaixo:
+    gluster volume set test-vol auth.allow "/(192.168.10.*|192.168.11.*),/outro-diretorio-1(192.168.1.*),/outro-diretorio-2(192.168.8.*)”
+    ```
+    - Especifica que:
+    1) A pasta raíz, definido pela '/', poderá ser montada por máquinas nas subredes 192.168.10.* e 192.168.11.*.
+    2) Consegue dizer quem consegue montar as pastas 'outro-diretorio-1' e 'outro-diretorio-2?
+
+- `gluster volume set gv0 auth.allow "192.168.1.10,192.168.15.120,192.168.20.20"`
 
 - Agora vamos precisar montar esse volume no servidor, seguindo essa sintaxe `mount.glusterfs <IP ou hostname>:<nome_do_volume> <ponto_de_montagem>`
 - O IP ou hostname pode ser de qualquer servidor que esteja presente no cluster.
 
 - No servidor1: 
-```
+    ```
     mkdir /mnt/gluster-test
     mount.glusterfs server1.librecode.coop:/gv0 /mnt/gluster-test
-```
+    ```
 - Vamos testar, criando arquivos no volume:
-```
+    ```
     for i in `seq -w 1 100`; do cp -rp /var/log/dpkg.log /mnt/gluster-test/copy-test-$i; done
-```
+    ```
 
 - Verificando se foram criados (essa pasta deve ser igual em todos servidores a partir de agora):
-```
+    ```
     ls -lha /mnt/gluster-teste
-```
+    ```
 
 #### Montando volumes automacamente
-- Adicione ao /etc/fstab `HOSTNAME-OU-ENDEREÇOIP:/NOME-DO-VOLUME PONTO-DE-MONTAGEM glusterfs defaults,_netdev 0 0`:
+- Adicione ao /etc/fstab `HOSTNAME:/NOME-DO-VOLUME PONTO-DE-MONTAGEM glusterfs defaults,_netdev 0 0`:
+- Exemplo:
 
-```
+    ```
     server1.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
-    server2.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
-    server3.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
-```
+    ```
 
 #### Ansible role
 - No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
 - 1) Inclua o `role` a sua playbook:
-```
----
-- hosts: glusterfs_servers
-  become: yes
-  roles:
-    - glusterfs
-```
+    ```
+    ---
+    - hosts: glusterfs_servers
+    become: yes
+    roles:
+        - glusterfs
+    ```
 
 - 2) Adicione ao seu `inventory.ini` o endereço dos servidores:
-```
-[glusterfs_servers]
-server1.exemplo.coop
-server2.exemplo.coop
-server3.exemplo.coop
-```
+    ```
+    [glusterfs_servers]
+    server1.exemplo.coop
+    server2.exemplo.coop
+    server3.exemplo.coop
+    ```
 3) Execute a playbook
-```
-    ansible-playbook -i inventory playbook.yml
-```
+    ```
+        ansible-playbook -i inventory playbook.yml
+    ```
 
 ```
 ```

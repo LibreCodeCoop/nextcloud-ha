@@ -9,3 +9,4 @@
 #    - vars/main.yml
   roles:
     - docker
+    - fail2ban

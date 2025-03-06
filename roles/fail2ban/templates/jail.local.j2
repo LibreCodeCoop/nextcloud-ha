@@ -1,0 +1,19 @@
+# roles/fail2ban/templates/jail.local.j2
+[DEFAULT]
+ignoreip = {{ fail2ban_ignoreip }}
+bantime  = {{ fail2ban_bantime }}
+findtime  = 1m
+maxretry = {{ fail2ban_maxretry }}
+banaction = route
+banaction_allports = route
+{% if fail2ban_xarf %}
+action = %(action_xarf)s
+{% else %}
+action = %(action_)s
+{% endif %}
+
+[sshd]
+enabled = true
+port    = ssh
+backend = systemd
+filter = sshd

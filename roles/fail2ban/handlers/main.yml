@@ -1,0 +1,5 @@
+# roles/fail2ban/handlers/main.yml
+- name: Reiniciar Fail2Ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: restarted
