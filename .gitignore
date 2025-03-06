@@ -1,7 +1,6 @@
 secrets.yml
-inventory.ini
 ansible.cfg
 .vagrant
 community
 collections
-
+inventory.ini
