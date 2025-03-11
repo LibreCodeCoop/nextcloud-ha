@@ -2,7 +2,7 @@
 - name: Criar arquivo de teste no servidor 1
   copy:
     content: "Este é um arquivo de teste para verificar a replicação do GlusterFS."
-    dest: /mnt/glusterfs/testfile.txt
+    dest: /mnt/gv10/testfile.txt
   delegate_to: "{{ server1 }}"
   register: file_creation
 
@@ -12,7 +12,7 @@
 
 - name: Aguardar até que o arquivo apareça no servidor 2
   wait_for:
-    path: /mnt/glusterfs/testfile.txt
+    path: /mnt/gv10/testfile.txt
     state: present
   delegate_to: "{{ server2 }}"
   register: file_wait
@@ -27,13 +27,13 @@
 
 - name: Verificar o checksum do arquivo no servidor 1
   stat:
-    path: /mnt/glusterfs/testfile.txt
+    path: /mnt/gv10/testfile.txt
   delegate_to: "{{ server1 }}"
   register: file_stat_server1
 
 - name: Verificar o checksum do arquivo no servidor 2
   stat:
-    path: /mnt/glusterfs/testfile.txt
+    path: /mnt/gv10/testfile.txt
   delegate_to: "{{ server2 }}"
   register: file_stat_server2
 
@@ -50,6 +50,6 @@
 
 - name: Limpar arquivo de teste
   file:
-    path: /mnt/glusterfs/testfile.txt
+    path: /mnt/gv10/testfile.txt
     state: absent
   delegate_to: "{{ server1 }}"

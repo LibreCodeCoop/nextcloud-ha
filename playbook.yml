@@ -10,3 +10,4 @@
   roles:
     - docker
     - fail2ban
+    - glusterfs
