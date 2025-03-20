@@ -52,8 +52,31 @@ graph LR
 ## Postgres
 - A replicação de bancos Postgres pode ser feita utilizando o [postgresql_cluster v2.0](https://www.postgresql.org/about/news/postgresql_cluster-v20-multi-cloud-postgresql-ha-clusters-free-open-source-2939/) ou algum dessa lista [aqui](https://www.postgresql.org/download/products/3-clusteringreplication/).
 
+## Patroni
+- Será utlizado a ferramenta Patroni, a qual facilita a gerência de clusters Postgres.
+- Em conjunto com ETCD e Haproxy é possível montar um cluster redundante.
 
 
+![alt text](/assets/image-patroni1.png)
+
+- As variáveis no arquivo `patroni/docker/patroni.env` devem ser modificadas:
+    ```bash
+    PATRONI_SUPERUSER_PASSWORD=
+    PATRONI_REPLICATION_PASSWORD=
+    PATRONI_admin_PASSWORD=
+    ```
+    
+- Faça o build da imagem: `cd patroni && docker build -t patroni .`
+- Crie a rede para o serviço: `docker network create patroni`
+- Serão necessários ajustar permissões dos volumes:
+    ```bash
+    mkdir -p patroni/volumes/patroni{1,2,3}
+    chown -R 999:999 patroni/volumes
+    chmod -R 700 patroni/volumes
+    ```
+
+- No arquivo (/patroni/docker-compose.yml) mude o valor de `ETCD_INITIAL_CLUSTER_TOKEN` para algo aleatório e seguro.
 
 
+- Agora é possível subir nosso cluster: `docker compose -f patroni/docker-compose.yml up -d`
 

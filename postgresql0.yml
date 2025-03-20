@@ -1,0 +1,8 @@
+bootstrap:
+    dcs:
+        standby_cluster:
+            host: 1.2.3.4 # IP do servidor no outro datacenter
+            port: 5432
+            primary_slot_name: patroni
+            create_replica_methods:
+            - basebackup
