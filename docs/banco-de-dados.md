@@ -65,7 +65,7 @@ graph LR
     PATRONI_REPLICATION_PASSWORD=
     PATRONI_admin_PASSWORD=
     ```
-    
+
 - Faça o build da imagem: `cd patroni && docker build -t patroni .`
 - Crie a rede para o serviço: `docker network create patroni`
 - Serão necessários ajustar permissões dos volumes:
@@ -80,3 +80,12 @@ graph LR
 
 - Agora é possível subir nosso cluster: `docker compose -f patroni/docker-compose.yml up -d`
 
+- Para observar o cluster e o status dos nós: `docker compose exec -it patroni1 patronictl list`
+
+- Se algum nó estiver falhando, pode ser necessário reiniciar o nó:
+    ```bash
+    docker compose exec -it patroni1 patronictl reinit nome-do-cluster nome-do-nó
+    ```
+- Para verificar a versão dos nós: `docker compose exec -it patroni1 patronictl version nome-do-cluster`
+
+- Para verificar a configuração dinâmica: `docker compose exec -it patroni1 patronictl show-config`
