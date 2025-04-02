@@ -1,7 +1,7 @@
 # Banco de dados
 - A seguir são descritos os bancos de dados suportados pela aplicação.
 - Dois cenários serão testados: 
-- 1) cluster em alta disponibilidade (mínimo 3 nós)
+- 1) cluster em alta disponibilidade
 - 2) cluter de replicação Primário/Secundário (mínimo 3 nós)
 
 ## Versões suportadas
@@ -47,14 +47,15 @@ graph LR
 ## MariaDB
 - Possiblidade de criar clusters utilizando o Galera MariaDB. Além disso, possui um [gerenciador gráfico](https://galeracluster.com/galera-mgr/).
 
-
-
 ## Postgres
 - A replicação de bancos Postgres pode ser feita utilizando o [postgresql_cluster v2.0](https://www.postgresql.org/about/news/postgresql_cluster-v20-multi-cloud-postgresql-ha-clusters-free-open-source-2939/) ou algum dessa lista [aqui](https://www.postgresql.org/download/products/3-clusteringreplication/).
 
 ## Patroni
 - Será utlizado a ferramenta Patroni, a qual facilita a gerência de clusters Postgres.
 - Em conjunto com ETCD e Haproxy é possível montar um cluster redundante.
+
+
+### ETCD
 
 
 ![alt text](/assets/image-patroni1.png)

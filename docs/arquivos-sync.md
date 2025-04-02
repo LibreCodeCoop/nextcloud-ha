@@ -132,8 +132,6 @@ nome de host do nó de sondagem pode ser feita a partir do nó sondado.
 
 ```
 
-
-
 - Em todos servidores, crie um volume a ser compartilhado:
     `mkdir -p /data/brick1/gv0`
 
@@ -197,7 +195,19 @@ nome de host do nó de sondagem pode ser feita a partir do nó sondado.
     ls -lha /mnt/gluster-gv0
 ```
 
-#### Montando volumes automacamente
+#### Removendo volumes
+- Para remover um volume, é necessário diminuir o número de réplicas do mesmo, afim de que não
+seja replicado em outros servidores. 
+- O exemplo abaixo demonst  ra a exclusão do volume `gv0` que está no servidor `server1.librecode.coop` que
+  está sincronizando a pasta `/mnt/gluster-gv0`.
+```bash
+    gluster volume remove-brick gv0 replica 1 server1.librecode.coop:/mnt/gluster-gv0 force
+    gluster volume delete gv0
+ ```
+
+
+
+#### Montando volumes automaticamente
 - Adicione ao /etc/fstab seguindo o padrão:
 > `HOSTNAME-OU-ENDEREÇOIP:/NOME-DO-VOLUME PONTO-DE-MONTAGEM glusterfs defaults,_netdev 0 0`
 
@@ -230,8 +240,3 @@ server3.exemplo.coop
     ansible-playbook -i inventory playbook.yml
 ```
 
-```
-```
-```
-```
-```
