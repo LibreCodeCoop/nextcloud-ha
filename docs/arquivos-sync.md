@@ -217,6 +217,49 @@ seja replicado em outros servidores.
     server3.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
 ```
 
+#### Monitorando carga de trabalho
+- O GlusterFS Top é um comando que permite ver a performânce dos blocos que estão sendo sincronizados.
+- É necessário habilitar a coleta de estatísticas no volume desejado.
+    ```bash
+    gluster volume profile $NOME-DO-VOLUME start 
+    ```
+- Vendo as estatísticas (informações de entrada e saída) do volume:
+    ```bash
+    gluster volume profile $NOME-DO-VOLUME info
+    ```
+- Quando não precisar mais das estatísticas, pode desabilitar:
+    ```bash
+    gluster volume profile $NOME-DO-VOLUME stop
+    ```
+
+**GlusterFS Top**
+- É possível ver a quantidade de descritores de arquivos (fd) abertos e a contagem máxima:
+
+    ```bash
+    gluster volume top $NOME-DO-VOLUME open brick $NOME-DO-BRICK list-cnt 10
+    ```
+
+- Para visualizar as maiores chamadas de leituras de arquivos (qual arquivo está sendo mais acessado). Se o nome do brick não for especificado, uma lista de 100 arquivos será exibida por padrão (removendo a opção `brick $NOME-DO-BRICK`):
+    ```bash
+    gluster volume top $NOME-DO-VOLUME read brick $NOME-DO-BRICK list-cnt 10
+    ```
+- Outras opções disponíveis são:
+    - write: arquivos com maior escrita
+    - opendir: diretórios mais acessados
+    - readdir: diretórios mais lidos
+
+- Visualizando o desempenho de leitura:
+- Com este comando é possível ver métricas de leitura de arquivos em cada brick.
+    ```bash
+    gluster volume top $NOME-DO-VOLUME read-perf bs 256 count 1 list-cnt 10
+    ```
+
+- Visualizando o desempenho de escrita:
+- Este comando iniciará uma adição para a contagem e tamanho de bloco especificados e medirá a taxa de transferência correspondente.
+    ```bash
+    gluster volume top $NOME-DO-VOLUME write-perf bs 256 count 1 list-cnt 10
+    ```
+
 ### Ansible role
 - No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
 - 1) Inclua o `role` a sua playbook:
