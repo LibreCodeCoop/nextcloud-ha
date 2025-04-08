@@ -26,8 +26,8 @@
 
 ## Configurações necessárias a nível de DNS:
     1) Entrada tipo A apontando para o IP da aplicação
-    3) Provedor de DNS sem suporte a certificados *wildcard*
-    2) Provedor de DNS com suporte a certificados *wildcard*
+    2) Provedor de DNS sem suporte a certificados *wildcard*
+    3) Provedor de DNS com suporte a certificados *wildcard*
 
 - Caso o provedor não suporte certificados *wildcard*, será necessário, quando a aplicação no Datacenter primário estiver comprometida, adicionar o IP do servidor 2 à entrada tipo A existente.
 - Se o provedor DNS suportar certificados *wildcard*, o mesmo deverá ser copiado para os demais servidores após a requisição no servidor 1.
@@ -38,8 +38,8 @@
 
 ## Banco de dados distribuídos
 - É possível utilizar MySQL, MariaDB ou Postgres. 
-- Optou-se por utilizar o gerenciador de altaa disponiblidade Patroni o qual implementa o Postgres.
-- Outra alternativa seria utilizar o Galera Manager ou o Autobase.
+- Optou-se por utilizar o gerenciador de alta disponiblidade Patroni o qual implementa o Postgres.
+- Outra alternativa seria utilizar o Galera Manager ou o Autobase. Ambos estão ducumentados mas optou-se pelo Patroni por sua simplicidade e flexibilidade.
 
 ## Ferramentas para backup e recuperação em caso de desastres
 - A ferramenta utilizada para backup (em servidor diferente do cluster) é o Duplicati.
@@ -65,6 +65,7 @@
 - Em estudo se será necessário.
 
 ## Diagramação da arquitetura proposta
+- Abaixo está o diagrama da arquitetura proposta.
 
 ```mermaid
 graph TB
