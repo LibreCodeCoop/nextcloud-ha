@@ -21,6 +21,7 @@
 - A topologia com dois datacenters para fazer o cluster de banco de dados fica da seguinte maneira:
 
 ![alt text](image.png)
+[Fonte](https://patroni.readthedocs.io/en/latest/ha_multi_dc.html)
 
 
 ## Configurações necessárias a nível de DNS:
@@ -142,3 +143,9 @@ graph TB
     class PAT1,PAT2 patroni
 ```
 
+## Considerações
+- Utilizando 2 data centers para a redundância requer intervenção manual para fazer a ativação do servidor secundário. Isso ocorre pois com apenas 2 nós não é possível utilizar o etcd para fazer a eleição de um líder. 
+
+- Ambiente com alta disponibilidade em 3 data centers.
+![alt text](image-1.png)
+[Fonte](https://patroni.readthedocs.io/en/latest/ha_multi_dc.html)
