@@ -61,7 +61,6 @@ services:
     container_name: etcd
     restart: unless-stopped
     ports:
-      - "4001:4001"
       - "2380:2380"
       - "2379:2379"
     volumes:
@@ -70,7 +69,7 @@ services:
       /usr/local/bin/etcd
       --name etcd
       --advertise-client-urls http://${HostIP}:2379
-      --listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001
+      --listen-client-urls http://0.0.0.0:2379
       --initial-advertise-peer-urls http://${HostIP}:2380
       --listen-peer-urls http://0.0.0.0:2380
       --initial-cluster-token etcd-cluster-1
@@ -81,7 +80,9 @@ services:
       - HostIP=${HostIP}
 ```
 
-- A partir do seu terminal para verificar quem faz parte do cluster:
+- A partir do seu terminal, para verificar quem faz parte do cluster:
 ```bash
 docker compose exec etcd etcdctl member list -w table
 ```
+
+# etcd com ssl

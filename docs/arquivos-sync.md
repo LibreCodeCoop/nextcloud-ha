@@ -160,13 +160,49 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     ls -lha /mnt/gluster-teste
     ```
 
-#### Montando volumes automacamente
+#### Montando volumes automáticamente
 - Adicione ao /etc/fstab `HOSTNAME:/NOME-DO-VOLUME PONTO-DE-MONTAGEM glusterfs defaults,_netdev 0 0`:
 - Exemplo:
 
     ```
     server1.librecode.coop:/data/brick1/gv0 /mnt/gluster-test/ glusterfs defaults,_netdev 0 0
     ```
+
+#### Monitoramento
+- Listando os 30 arquivos que são mais lidos:
+`gluster volume top nome-do-volume read list-cnt 30`
+
+- Listando os 30 diretórios que são mais abertos:
+`gluster volume top nome-do-volume opendir list-cnt 30`
+
+- Listando os 30 diretórios que são mais lidos:
+`gluster volume top nome-do-volume readdir list-cnt 30`
+
+- Verificando status do volume:
+` gluster volume status nome-do-volume detail`
+
+- Listando os clientes que estão acessando o volume:
+` gluster volume status nome-do-volume clients`
+
+
+#### Considerações de performance
+- Ao sincronizar todo o diretório do Nextcloud(dados + código) não houve um desempenho satisfatório do GlusterFS. 
+- Aconselha-se utilizar um ponto de montagem separado do sistema operacional, e, mudar a pasta de dados dos usuários para o diretório o ponto de montagem a ser sincronizado.
+- Exemplo de alteração da pasta de dados (dados dos usuários):
+    ```bash
+    # Coloque a instância em modo de manutenção
+    occ maintenance:mode --on
+    
+    # Altere o diretório dos dados
+    occ config:system:set datadirectory --value='/novo/caminho/dos/dados'
+    
+    # Sincronize os arquivos mantendo as permissões
+    rsync -az /caminho/antigo /novo/caminho/dos/dados
+
+    # Retire do modo de manutenção
+    occ maintenance:mode --off
+    ```
+- 
 
 #### Ansible role
 - No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
