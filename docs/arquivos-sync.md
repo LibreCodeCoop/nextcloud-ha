@@ -59,14 +59,15 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 
 - Ponto negativo: não faz a checagem de integridade dos dados.
 
-#### Configuração
-1 - Copiar a
+- Na imagem abaixo existem 5 zonas com múltiplos servidores em cada zona. 
+- Os círculos vermelhos e azuis representam dados, os quais estão espalhados pelas zonas. Repare que cada dado é replicado 3 vezes.
 
-- Após fazer a instalação, configurar o cluster e adicionar uma chave de acesso ao bucket criado, configure os registros DNS.
-- Por exemplo: 
-- Entrada 1: 20.180.0.10 -> garage.dominio.com.br.
-- Entrada 2: 20.180.0.30 -> garage.dominio.com.br.
-- Entrada 3: 20.180.0.60 -> garage.dominio.com.br.
+![alt text](/assets/garage-1.png)
+
+
+#### Configuração
+- Disponível nesse [repositório](https://github.com/LibreCodeCoop/garages3).
+
 
 
 ### GlusterFS
@@ -77,7 +78,7 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 
 - No seu serviço de DNS, adicione as entradas do tipo A para os servidores.
 
-- No meu caso cenário:
+- Exemplo de cenário:
     ```
     server1.librecode.coop - 189.x.x.x
     server2.librecode.coop - 177.x.x.x
@@ -131,7 +132,7 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     gluster volume start gv0
     ```
 
-- **Melhorando a segurança**
+- **Segurança**
     ```
     Para restringir acesso aos diretório, podemos utilizar a diretiva `auth.allow`. Veja o seguinte exemplo abaixo:
     gluster volume set test-vol auth.allow "/(192.168.10.*|192.168.11.*),/outro-diretorio-1(192.168.1.*),/outro-diretorio-2(192.168.8.*)”
@@ -202,7 +203,25 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     # Retire do modo de manutenção
     occ maintenance:mode --off
     ```
-- 
+ 
+
+#### Removendo volumes e reiniciando o cluster
+- Antes de desfazer o pareamento com outros servidores (com o comando `gluster probe`), é necessário remover os `bricks` do volume.
+
+- Reduza as réplicas para `2` de todos os `bricks` do volume:
+- Por exemplo:
+    `gluster volume remove-brick NOME-DO-VOLUME replica 2 serverY.librecode.coop:/data-brick1/gv0 force`
+
+
+- E então saia do cluster: `gluster peer detach serverY.seudominio force`
+
+### Problemas
+#### transport endpoint not connected
+- Verifique se o firewall não está bloqueandoa comunicação entre os servidores.
+
+#### permissions on mountbroker-root directory are too liberal 
+- O dono do diretório raiz (utilizado pelo gluster para ser montado posteriormente) deve ter as permissões de dono e grupo `root` e de acesso `0711`.
+
 
 #### Ansible role
 - No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
