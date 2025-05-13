@@ -69,7 +69,6 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 - Disponível nesse [repositório](https://github.com/LibreCodeCoop/garages3).
 
 
-
 ### GlusterFS
 
 - Os servidores usados ​​para criar o pool de armazenamento devem ser resolvíveis pelo nome do host.
@@ -215,13 +214,34 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 
 - E então saia do cluster: `gluster peer detach serverY.seudominio force`
 
+#### Volume replicado versus Geo-replicação
+- É possível configurar a geo-replicação. Na tabela abaixo podemos ver a diferença:
+
+| Georreplicação de Volumes  |  Geo-replicação |
+|---|---|
+| Espelha dados em clusters  | Espelha dados em clusters distribuídos geograficamente  |
+| Fornece alta disponibilidade  | Garante backup de dados para recuperação de desastres  |
+| Replicação síncrona (cada operação de arquivo é enviada entre todos os blocos).  | Replicação assíncrona (verifica as alterações nos arquivos periodicamente e as sincroniza ao detectar diferenças).  |
+
+
+### Comando úteis
+- Verificar detalhes de um volume: `gluster volume status VOLUME detail`
+- Clientes conectados a um volume: `gluster volume status VOLUME clients`
+
+
 ### Problemas
 #### transport endpoint not connected
-- Verifique se o firewall não está bloqueandoa comunicação entre os servidores.
+- Verifique se o firewall não está bloqueando a comunicação entre os servidores.
 
 #### permissions on mountbroker-root directory are too liberal 
 - O dono do diretório raiz (utilizado pelo gluster para ser montado posteriormente) deve ter as permissões de dono e grupo `root` e de acesso `0711`.
 
+#### 0-glusterfsd-mgmt: Exhausted all volfile servers
+- Verifique se o arquivo `/etc/hosts` está correto.
+
+#### Porta TCP não disponível
+- Com o comando `gluster volume status VOLUME detail` é possível obter mais informações.
+- Se no campo `TCP Port` estiver com o valor `N/A`, significa que este servidor não está conseguindo se comunicar com os outros servidores.
 
 #### Ansible role
 - No diretório `roles` é possível encontrar um `role` para utilizar no Ansible.
