@@ -11,7 +11,7 @@ flowchart TB
     subgraph DC2[Datacenter Secundário]
         LB2[Keepalived em Espera] --> NGINX_PROXY2[NGINX Proxy Reverso 2]
         NGINX_PROXY2 --> NGINX_WEB2[NGINX Web 2]
-        NGINX_WEB2 --> APP2[Application 2]
+        NGINX_WEB2 --> APP2[Aplicação 2]
         APP2 --> DB2[(Banco de Dados Réplica)]
         APP2 --> REDIS2[(Redis Réplica)]
     end
