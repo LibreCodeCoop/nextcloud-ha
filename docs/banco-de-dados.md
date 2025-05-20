@@ -53,6 +53,9 @@ graph LR
 - A replicação de bancos Postgres pode ser feita utilizando o [postgresql_cluster v2.0](https://www.postgresql.org/about/news/postgresql_cluster-v20-multi-cloud-postgresql-ha-clusters-free-open-source-2939/) ou algum dessa lista [aqui](https://www.postgresql.org/download/products/3-clusteringreplication/).
 - Será utilizado o Patroni, o qual é um conjunto de scripts em python que automatizam o gerenciamento de falhas em clusters.
 
+### Replicação nativa
+- Consulte a documentação [aqui](postgres-replica.md) para fazer a réplica do postgres manualmente.
+
 ### Patroni
 #### Configuração de Cluster Standby entre Data Centers
 - Para fazer o cluster do Patroni do datacenter 1 para o datacenter 2, será utilizada a característica Standby Cluster. 
