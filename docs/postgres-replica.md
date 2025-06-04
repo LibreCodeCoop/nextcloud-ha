@@ -1,8 +1,8 @@
 # Setup de replicação no postgres
-- Este manual exemplifica como fazer a configuração de replicação no postgres.
-- São considerados ao menos 2 servidores mas podem ser adicionados mais.
+- Este manual exemplifica como fazer a configuração de replicação no postgres, de maneira manual.
+- São considerados ao menos 2 servidores, mas, podem ser adicionados mais.
 
-
+- Nota: a leitura e escrita é feita apenas no principal.
 
 ## Servidor primário
 - Crie o arquivo `compose.yml`:
@@ -89,7 +89,7 @@ max_replication_slots = 10  # Número máximo de slots de replicação
 # TYPE  DATABASE        USER                    ADDRESS                        METHOD
 local   all             all                                                    trust
 host    all             all                     127.0.0.1/32                   trust
-host 	all		        all		                172.0.0.0/8		               trust
+host 	  all		          all		                  172.0.0.0/8		                 trust
 host    all             usuario_replicacao      IP_Servidor_Secundário/32      md5
 ```
 

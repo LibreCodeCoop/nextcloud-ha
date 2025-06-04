@@ -38,51 +38,27 @@ Membro "Learner",
 Leitura totalmente concorrente,
 Melhorias de desempenho
 
-# algoritmo raft
+# Algoritmo raft
 - Raft é um algorítmo de consenso distribuído, ou seja, ele garante que os dados sejam replicados com consistência num sistema distribuído.
 - Consiste em três partes principais:
     1. Eleição de Líder: um dos nós do sistema é eleito como líder e todos seguem o mesmo. Ele quem controla as operações de escrita no sistema. Isso evita que um nó que está em espera processe dados, por exemplo.
-    2. Replicação de Logs:
-    3. Segurança da Eleição:
+    2. Replicação de Logs: todas as mudanças no estado do sistema são registradas em log e replicado em todos os nós. O líder é responsável por replicar os logs e garantir que todos os nós estejam atualizados, o que simplifica o gerenciamento e facilita o entendimento.
+    3. Segurança da Eleição: apenas um líder pode ser eleito a qualquer momento. Um novo líder é eleito se o líder falhar.
+
+## Processo de eleição
+- Inicialmente todos nós se encontram em estado de eleição, quando os mesmos estão sem um líder. Sempre que não há lider ocorre um processo de eleição.
+- O processo de eleição envolve os seguintes estágios:
+  - Candidatura: nó solicita votos de outros nós. Apenas um voto por eleição é possível.
+  - Votação: Se o nó não votou ainda nesta eleição, concede seu voto ao nó que achar legítimo.
+  - Eleição de líder: ganha a eleição o nó que tiver a maioria dos votos. 
+
+- No seguinte (endereço)[https://raft.github.io] é possível observar a simulação de como o protocolo raft funciona em um cluster.
+- Faça o seguinte teste: exclua um dos membros do cluster e observe o que acontece.
+
+![alt text](../assets/raft1.png)
 
 
+- Uma decisão só é considerada válida se ela tem um *quorum*, ou seja, tem a maioria dos votos.
+- Ou seja, são necessários no mínimo 3 nós para garantir alguma tolerância a falhas.
+- A seguinte fórmula pode ser aplicada: ** ToleranciaFalhas = (Número de nós) - (Tamanho do quorum) **
 
-# etcd em docker
-- É necessário export a API do etcd para "fora" docontainer, então defina o IP que será acessível a API:
-** Nota: é possível criar um rede no docker para interligar os containers e referenciá-los pelo nome **
-```bash
-export HostIP="10.13.0.20"
-```
-- Crie o arquivo `compose.yml`:
-```bash
-services:
-  etcd:
-    image: quay.io/coreos/etcd:v3.5.20
-    container_name: etcd
-    restart: unless-stopped
-    ports:
-      - "2380:2380"
-      - "2379:2379"
-    volumes:
-      - "/usr/share/ca-certificates/:/etc/ssl/certs"
-    command: >
-      /usr/local/bin/etcd
-      --name etcd
-      --advertise-client-urls http://${HostIP}:2379
-      --listen-client-urls http://0.0.0.0:2379
-      --initial-advertise-peer-urls http://${HostIP}:2380
-      --listen-peer-urls http://0.0.0.0:2380
-      --initial-cluster-token etcd-cluster-1
-      --initial-cluster etcd=http://${HostIP}:2380
-      --initial-cluster-state new
-    
-    environment:
-      - HostIP=${HostIP}
-```
-
-- A partir do seu terminal, para verificar quem faz parte do cluster:
-```bash
-docker compose exec etcd etcdctl member list -w table
-```
-
-# etcd com ssl
