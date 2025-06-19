@@ -52,11 +52,26 @@
 
 ### nftables
 - `nftables` é o novo framework para filtragem de pacotes no Linux, substituindo o `iptables`.
-- 
+  
 - Exemplo de algumas regras que podem serem definidas:
     ```bash
     - Porta 80: Aceita conexão de todos IPs
     - Porta 443: Aceita conexão de todos IPS
     - Porta 22: Aceita conexão apenas de IPs administrativos
     - Porta 51820: Aceita conexão apenas de IPs administrativos e réplicas
+    ```
+### Portas expostas
+- Uma boa prática é manter uma lista de portas que são expostas e qual IP pode acessá-las.
+- Por exemplo:
+
+| Servidores GlusterFS | Protocolo | Porta       | Origem/Destino                                                 | Serviço                                                                 |
+|----------------------|-----------|-------------|----------------------------------------------------------------|-------------------------------------------------------------------------|
+| Servidores GlusterFS | TCP       | 24007,24008 | Servidores GlusterFS                                           | Gluster Daemon (Serviço principal do GlusterFS)                        |
+| Servidores GlusterFS | TCP       | 49152+1 porta para cada *brick*      | Servidores GlusterFS                                           | Cada *brick* (unidade de armazenamento) requer sua própria porta |
+
+- Restringir acesso às portas:
+    ```bash
+    sudo iptables -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 24007:24008 -j ACCEPT
+    
+    sudo iptables -A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 49152:49156 -j ACCEPT
     ```
