@@ -2,8 +2,12 @@
 - Este manual exemplifica como fazer a configuração de replicação no postgres, de maneira manual.
 - São considerados ao menos 2 servidores, mas, podem ser adicionados mais.
 
-- Nota: a leitura e escrita é feita apenas no principal.
-
+- **Notas importantes**:
+  ```bash
+  - a leitura e escrita é feita apenas no principal;
+  - se o primário falhar, será necessário promover a replica manualmente;
+  ```
+  
 ## Servidor primário
 - Crie o arquivo `compose.yml`:
 
