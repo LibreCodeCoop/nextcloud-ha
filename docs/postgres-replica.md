@@ -4,11 +4,16 @@
 
 - **Notas importantes**:
   ```bash
-  - a leitura e escrita é feita apenas no principal;
-  - se o primário falhar, será necessário promover a replica manualmente;
+    Leitura e Escrita: Apenas o servidor primário aceita operações de leitura e escrita.
+    Os servidores secundários operam em modo de somente leitura, garantindo a consistência dos dados e evitando conflitos.
+
+    Promoção Manual: Em caso de falha do servidor primário, a promoção do servidor secundário para primário deve ser realizada manualmente.
+    Este processo envolve etapas específicas para garantir a integridade dos dados e a continuidade do serviço.
   ```
   
 ## Servidor primário
+- O servidor primário é a instância principal do PostgreSQL, responsável por processar todas as operações de leitura e escrita.
+- Para configurá-lo, siga os passos abaixo:
 - Crie o arquivo `compose.yml`:
 
 ```
