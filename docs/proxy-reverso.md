@@ -13,7 +13,13 @@
 
 ## Nginx-proxy
 - O proxy utilizado será o [nginx-proxy](https://github.com/LibreCodeCoop/nginx-proxy), o qual possui a funcionalidade de descobrir os containers que estão sendo executados e adicionar as configurações automagicamente ao nginx.
+- Além disso, gerencia os certificados SSL com LetsEncrypt.
+- Configurações adicionais você encontra na [documentação do projeto](https://github.com/nginx-proxy/nginx-proxy/tree/main/docs).
 
+- É possível fazer o balanceamento de carga conforme consta na [documentação](https://github.com/nginx-proxy/nginx-proxy/tree/main/docs#upstream-server-http-load-balancing-support).
+
+## Traefik
+- 
 
 ## Ferramentas para verificar que um servidor ficou indisponível
 - Em se tratando de um cluster de uma determinada aplicação, um cenário possível é haver uma votação para eleger quem responderá as solicitações dos usuários.
