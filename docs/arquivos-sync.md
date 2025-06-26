@@ -73,7 +73,10 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
 
 - Os servidores usados ​​para criar o pool de armazenamento devem ser resolvíveis pelo nome do host.
 - O daemon glusterd deve estar em execução em todos os servidores de armazenamento que você deseja adicionar ao pool de armazenamento. V
-- O firewall nos servidores deve ser configurado para permitir acesso à porta 24007.
+- O firewall nos servidores deve ser configurado para permitir acesso às portas `tcp` `111, 24007,24008`.
+- Cada volume montado utiliza uma porta, por exemplo, teríamos de liberar a porta `24009` caso tenhamos 1 volume montado.
+- Caso tenhamos mais, precisamos liberar conexão para portas acima da `24009`, no caso, `24010` e assim por diante.
+- Essa porta base é configurável nas configurações do gluster.
 
 - No seu serviço de DNS, adicione as entradas do tipo A para os servidores.
 
@@ -85,16 +88,17 @@ h) Compatibilidade POSIX/Sistema de arquivos: não pretendemos ser compatíveis 
     ```
 
 - Idealmente o diretório contendo os arquivos que serão sincronizados devem ficar em outro disco, separado do sistema operacional.
-
+    ```
     apt update
     apt install glusterfs-server -y
     systemctl start glusterd
     systemctl enable glusterd
-
+    ```
 - No servidor 1:
+    ```
     gluster peer probe servidor2
     gluster peer probe servidor3
-
+    ```
 
 - No servidor 2, com o comando `gluster peer status`:
 
