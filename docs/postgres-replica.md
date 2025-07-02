@@ -163,3 +163,47 @@ services:
 - Suba o container: `docker compose up -d`
 
 
+## Verificar a replicação
+- Maneiras de verificar a replicação no ambiente:
+- No **servidor primário**, para ver as conexões de replicações ativas(substitua conforme o nome do seu container e nome de usuário):
+```bash
+docker exec -ti postgres-postgres-1 psql -U postgres -c "SELECT * FROM pg_stat_replication;"
+```
+- A saída deve mostrar as conexões de replicação ativas. Exemplo:
+```bash
+pid  | usesysid |  usename   | application_name |  client_addr   | client_hostname | client_port |         backend_start         | backend_xmin |   state   |  sent_lsn  | write_lsn  | flush_lsn  | replay_lsn | write_lag | flush_lag | replay_lag | sync_priority | sync_state |          reply_time           
+------+----------+------------+------------------+----------------+-----------------+-------------+-------------------------------+--------------+-----------+------------+------------+------------+------------+-----------+-----------+------------+---------------+------------+-------------------------------
+ 3314 |    16384 | replicator | walreceiver      | 192.168.1.128 |                 |       53852 | 2025-07-02 18:16:28.528077+00 |              | streaming | 0/540BAD70 | 0/540BAD70 | 0/540BAD70 | 0/540BAD70 |           |           |            |             0 | async      | 2025-05-02 18:46:26.971339+00
+
+```
+
+
+- Na **réplica**, verificar se está em modo de recuperação:
+```bash
+docker exec -ti postgres-postgres-1 psql -U postgres -c "SELECT pg_is_in_recovery();"
+```
+- Deve retornar `t` indicando verdadeiro, true. 
+
+
+- Ver progresso da replicação: 
+```bash
+ocker exec -ti postgres psql -U postgres -c "SELECT now() AS current_time, pg_last_wal_receive_lsn() AS receive_lsn, pg_last_wal_replay_lsn()  AS replay_lsn pg_wal_lsn_diff(pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn()) AS replay_delay;"
+```
+
+
+
+## Replica para Primária
+- O que fazer quando a réplica precisa assumir o papél de primária e passar a responder as requisições dos clientes?
+- Será necessário promover a réplica:
+```bash
+docker exec -ti postgres-postgres-1 psql -U postgres -c "SELECT pg_promote();"
+# ou
+docker exec -ti postgres-postgres-1 pg_ctl promote -D /var/lib/postgresql/data
+```
+
+- Feito isso, podemos configurar a nossa aplicação para usar esse banco de dados.
+
+### Caminho contrário
+- Se o antigo primário voltar a funcionar, devemos realizar o processo utilizando o `pg_basebackup` 
+  
+  à partir do antigo primário e configurar a replicação para o mesmo.
