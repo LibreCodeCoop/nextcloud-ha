@@ -4,7 +4,7 @@
 
 ## Usuários logados
 - O comando `w` ou `who`, mostra quem está logado **atualmente**.
-- Já o comando `last`, informa o histórico de quem acesou o servidor.
+- Já o comando `last`, informa o histórico de quem acessou o servidor.
  
 
 ## Histórico de comandos
