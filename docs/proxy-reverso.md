@@ -1,19 +1,20 @@
 # Proxy reverso
 - Um proxy reverso é utilizado para ser o ponto de entrada para as aplicações que estão "atrás" do mesmo. 
+
 - Pode ter as seguintes características:
     * requisitar certificados válidos
     * encaminhar corretamente as requisições às aplicações
-    * fazer cache
+    * cache de conteúdo
     * centralização do monitoramento
-    * balanceamento de carga entre as aplicações
+    * balanceamento de carga
     * alta disponibilidade
 
 - Antes de configurar um ambiente em alta disponibilidade, certifique-se de ter configurado os registros DNS apropriadamente.
 - Para garantir alta disponibilidade, é possível utilizar os seguintes softwares:
 
 ## Nginx-proxy
-- O proxy utilizado será o [nginx-proxy](https://github.com/LibreCodeCoop/nginx-proxy), o qual possui a funcionalidade de descobrir os containers que estão sendo executados e adicionar as configurações automagicamente ao nginx.
-
+- Para a implementação de um proxy reverso, o [nginx-proxy](https://github.com/LibreCodeCoop/nginx-proxy) é uma solução popular e eficiente, especialmente em ambientes baseados em contêineres. 
+- Ele automatiza a configuração do Nginx, detectando contêineres em execução e adicionando as configurações de proxy reverso dinamicamente. Isso simplifica enormemente o gerenciamento de múltiplos serviços e subdomínios, pois o Nginx-proxy se encarrega de atualizar suas configurações sempre que um novo contêiner é iniciado ou parado.
 
 ## Ferramentas para verificar que um servidor ficou indisponível
 - Em se tratando de um cluster de uma determinada aplicação, um cenário possível é haver uma votação para eleger quem responderá as solicitações dos usuários.
